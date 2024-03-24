@@ -1,7 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { BodyRequestContext, ErrorSchema } from "../shared";
 import { TypeOf } from "zod";
-import k8s from "@kubernetes/client-node";
+import { customObjectApi } from "../utils/k8s-client";
 
 const AddDomainSchema = z.object({
   name: z
@@ -76,10 +76,6 @@ export const addHandler = async (
 ) => {
   const input = c.req.valid("json");
 
-  const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
-
-  const k8sApiClient = kc.makeApiClient(k8s.CustomObjectsApi);
   const ingressRoute = {
     apiVersion: "traefik.io/v1alpha1",
     kind: "IngressRoute",
@@ -88,30 +84,35 @@ export const addHandler = async (
       namespace: "default",
     },
     spec: {
-      entryPoints: ["web"],
+      entryPoints: ["websecure"],
       routes: [
         {
           match: `Host("${input.name}")`,
           kind: "Rule",
           services: [
             {
-              name: "whoami",
-              port: 80,
+              name: "qco-web",
+              port: 3000,
             },
           ],
+          tls: {
+            certResolver: "letsencrypt",
+          },
         },
       ],
     },
   };
   try {
-    k8sApiClient.createNamespacedCustomObject(
-      "traefik.containo.us",
+    await customObjectApi.createNamespacedCustomObject(
+      "traefik.io",
       "v1alpha1",
       "default",
       "ingressroutes",
       ingressRoute
     );
-  } catch (err: unknown) {}
+  } catch (err: unknown) {
+    console.log(err);
+  }
 
   const data = ResponseSchema.parse({ name: input.name });
 

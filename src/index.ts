@@ -3,7 +3,6 @@ import { domainsApi } from "./domains";
 import { middleware } from "./middleware";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
-import "./env";
 
 const app = new Hono();
 

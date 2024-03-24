@@ -5,6 +5,7 @@ export const env = createEnv({
   server: {
     SECRET_KEY: z.string().min(1),
     CNAME_TARGET: z.string().url(),
+    KUBE_CONFIG_DATA: z.string(),
   },
 
   /**
