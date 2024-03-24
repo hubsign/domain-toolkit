@@ -7,22 +7,23 @@ import "./env";
 
 const app = new Hono();
 
-export const docApi = new OpenAPIHono();
-docApi.use("/openapi", cors());
+export const api = new OpenAPIHono();
 
-docApi.doc("/openapi", {
+app.get("/health", (c) => {
+  return c.text("Health Live!");
+});
+
+app.use("/domains/*", middleware);
+api.use("/*", cors());
+
+api.doc("/openapi", {
   openapi: "3.0.0",
   info: {
     version: "1.0.0",
     title: "Domain-Toolkit API",
   },
 });
-app.route("/", docApi);
+api.route("/domains", domainsApi);
 
-app.get("/health", (c) => {
-  return c.text("Health Live!");
-});
-app.route("/domains", domainsApi);
-app.use("/domains/*", middleware);
-
+app.route("/", api);
 export default app;
