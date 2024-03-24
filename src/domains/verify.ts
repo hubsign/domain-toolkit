@@ -49,6 +49,14 @@ export const verifyRoute = createRoute({
       },
       description: "Verify",
     },
+    400: {
+      content: {
+        "application/json": {
+          schema: ErrorSchema,
+        },
+      },
+      description: "Returns an error",
+    },
     401: {
       content: {
         "application/json": {
