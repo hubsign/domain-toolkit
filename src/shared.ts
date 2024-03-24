@@ -15,3 +15,8 @@ export type RequestContext<Params> = Context<
   string,
   { in: { param: Params }; out: { param: Params } }
 >;
+export type BodyRequestContext<Params> = Context<
+  {},
+  string,
+  { in: { json: Params }; out: { json: Params } }
+>;
