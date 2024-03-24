@@ -1,4 +1,7 @@
 {
+  "name": "@hubsign/domain-toolkit",
+  "version": "0.0.1",
+  "author": "Maksim",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build:prod": "bun build --target=bun ./src/index.ts --outdir ./dist"
