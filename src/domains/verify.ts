@@ -1,8 +1,9 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { Context } from "hono";
-import { ErrorSchema } from "../shared";
+import { ErrorSchema, RequestContext } from "../shared";
 import { checkCnameRecord } from "./utils";
 import { env } from "../env";
+import { TypeOf } from "zod";
 
 const ParamsSchema = z.object({
   domain: z
@@ -68,22 +69,7 @@ export const verifyRoute = createRoute({
 });
 
 export const verifyHandler = async (
-  c: Context<
-    {},
-    "/:domain/verify",
-    {
-      in: {
-        param: {
-          domain: string;
-        };
-      };
-      out: {
-        param: {
-          domain: string;
-        };
-      };
-    }
-  >
+  c: RequestContext<TypeOf<typeof ParamsSchema>>
 ) => {
   const { domain } = c.req.valid("param");
 
