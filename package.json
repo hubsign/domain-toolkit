@@ -3,6 +3,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@hono/zod-openapi": "^0.9.9",
     "hono": "^4.1.3"
   },
   "devDependencies": {
