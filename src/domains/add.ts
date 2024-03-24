@@ -79,8 +79,7 @@ export const addHandler = async (
   const kc = new k8s.KubeConfig();
   kc.loadFromDefault();
 
-  const k8sApiClient = kc.makeApiClient(k8s.CoreV1Api);
-
+  const k8sApiClient = kc.makeApiClient(k8s.CustomObjectsApi);
   const ingressRoute = {
     apiVersion: "traefik.io/v1alpha1",
     kind: "IngressRoute",
@@ -104,6 +103,15 @@ export const addHandler = async (
       ],
     },
   };
+  try {
+    k8sApiClient.createNamespacedCustomObject(
+      "traefik.containo.us",
+      "v1alpha1",
+      "default",
+      "ingressroutes",
+      ingressRoute
+    );
+  } catch (err: unknown) {}
 
   const data = ResponseSchema.parse({ name: input.name });
 
