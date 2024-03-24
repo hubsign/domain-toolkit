@@ -1,20 +1,21 @@
-import * as dns from "dns";
-import { promisify } from "util";
+import dns from "node:dns";
 
-const lookupCname = promisify(dns.resolveCname);
-
-export async function checkCnameRecord(
+export function checkCnameRecord(
   domain: string,
-  targetCname: string
+  expectedCname: string
 ): Promise<boolean> {
-  try {
-    const cnames = await lookupCname(domain);
-    return cnames.includes(targetCname);
-  } catch (error) {
-    console.error(
-      `Ошибка при проверке CNAME записи для домена ${domain}:`,
-      error
-    );
-    return false;
-  }
+  dns.setServers(["8.8.8.8", "8.8.4.4"]);
+  return new Promise((resolve, reject) => {
+    dns.resolveCname(domain, (err, records) => {
+      if (err) {
+        console.error(
+          `Error fetching CNAME record for ${domain}: ${err.message}`
+        );
+        resolve(false);
+      } else {
+        const found = records.some((record) => record === expectedCname);
+        resolve(found);
+      }
+    });
+  });
 }

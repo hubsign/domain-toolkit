@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts"
+    "build:prod": "bun build --target=bun ./src/index.ts --outdir ./dist"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.9.9",
