@@ -25,4 +25,7 @@ api.doc("/openapi", {
 api.route("/domains", domainsApi);
 
 app.route("/", api);
-export default app;
+export default {
+  port: 8000,
+  fetch: app.fetch,
+};

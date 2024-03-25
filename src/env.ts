@@ -6,6 +6,11 @@ export const env = createEnv({
     SECRET_KEY: z.string().min(1),
     CNAME_TARGET: z.string().url(),
     KUBE_CONFIG_DATA: z.string(),
+    ENTRY_POINT: z.string(),
+    NAMESPACE: z.string(),
+    API_VERSION: z.string(),
+    SERVICE_NAME: z.string(),
+    SERVICE_PORT: z.number().optional(),
   },
 
   /**
