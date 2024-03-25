@@ -2,6 +2,8 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { BodyRequestContext, ErrorSchema } from "../shared";
 import { TypeOf } from "zod";
 import { customObjectApi } from "../utils/k8s-client";
+import { env } from "../env";
+import { nanoid } from "nanoid";
 
 const AddDomainSchema = z.object({
   name: z
@@ -76,30 +78,37 @@ export const addHandler = async (
 ) => {
   const input = c.req.valid("json");
 
+  const entryPoints = [env.ENTRY_POINT || "websecure"];
+  const namespace = env.NAMESPACE || "default";
+  const apiVersion = env.API_VERSION || "traefik.io/v1alpha1";
+  const serviceName = env.SERVICE_NAME || "web";
+  const servicePort = parseInt(env.SERVICE_PORT || "3000", 10);
+  const uniqueName = `${input.name}-${Date.now()}`;
+
   const ingressRoute = {
-    apiVersion: "traefik.io/v1alpha1",
+    apiVersion,
     kind: "IngressRoute",
     metadata: {
-      name: "whoami",
-      namespace: "default",
+      name: uniqueName,
+      namespace,
     },
     spec: {
-      entryPoints: ["websecure"],
+      entryPoints,
       routes: [
         {
-          match: `Host("${input.name}")`,
+          match: `Host(\`${input.name}\`)`,
           kind: "Rule",
           services: [
             {
-              name: "qco-web",
-              port: 3000,
+              name: serviceName,
+              port: servicePort,
             },
           ],
-          tls: {
-            certResolver: "letsencrypt",
-          },
         },
       ],
+      tls: {
+        certResolver: "letsencrypt",
+      },
     },
   };
   try {
