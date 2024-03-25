@@ -91,6 +91,10 @@ export const addHandler = async (
     metadata: {
       name: uniqueName,
       namespace,
+      annotations: {
+        "custom/uid": nanoid(),
+        "custom/domain-name": input.name,
+      },
     },
     spec: {
       entryPoints,
