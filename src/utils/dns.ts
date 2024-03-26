@@ -35,7 +35,8 @@ export async function checkCnameRecord(
 
 export async function getNameServers(domain: string): Promise<string[]> {
   try {
-    const records = await dns.promises.resolveNs(domain);
+    const primaryDomain = getPrimaryDomain(domain);
+    const records = await dns.promises.resolveNs(primaryDomain);
     return records;
   } catch (err) {
     if (err instanceof Error) {
@@ -85,4 +86,29 @@ export async function getCnameServers(domain: string): Promise<string[]> {
     }
     return [];
   }
+}
+
+/**
+ * Extracts the primary domain from a given domain name.
+ * @param domain The full domain name from which to extract the primary domain.
+ * @returns The primary domain.
+ */
+export function getPrimaryDomain(domain: string): string {
+  // Validate the input to ensure it's a non-empty string.
+  if (typeof domain !== "string" || domain.trim() === "") {
+    throw new Error("Invalid domain name provided.");
+  }
+
+  // Split the domain by dots and remove any empty strings caused by leading or trailing dots.
+  const parts = domain.split(".").filter(Boolean);
+
+  // Ensure the domain has at least two parts (e.g., example.com).
+  if (parts.length < 2) {
+    throw new Error(
+      "Invalid domain name provided. A valid domain must contain at least one dot."
+    );
+  }
+
+  // Return the last two parts joined by a dot, which represents the primary domain.
+  return parts.slice(-2).join(".");
 }
