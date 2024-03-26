@@ -1,6 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema, RequestContext } from "../shared";
 import { TypeOf } from "zod";
+import { getAServers, getCnameServers, getNameServers } from "../utils/dns";
 
 const ParamsSchema = z.object({
   domain: z
@@ -20,16 +21,20 @@ const ParamsSchema = z.object({
 const ConfigSchema = z
   .object({
     aValues: z.string().array().openapi({
-      description: "",
+      description:
+        "An array of IP addresses associated with the domain's A records. These records map the domain to its corresponding IP addresses.",
     }),
     cnames: z.string().array().openapi({
-      description: "",
+      description:
+        "An array of canonical names for the domain, specified as CNAME records. These records map domain aliases to their canonical (true) domain names.",
     }),
     nameservers: z.string().array().openapi({
-      description: "",
+      description:
+        "A list of nameserver addresses that are authoritative for the domain. These servers manage DNS records for the domain.",
     }),
     misconfigured: z.boolean().openapi({
-      description: "",
+      description:
+        "Whether or not the domain is configured AND we can automatically generate a TLS certificate.",
     }),
   })
   .openapi({
@@ -78,13 +83,14 @@ export const configHandler = async (
 ) => {
   const { domain } = c.req.valid("param");
 
-  //
-
+  const nameservers = await getNameServers(domain);
+  const aValues = await getAServers(domain);
+  const cnames = await getCnameServers(domain);
   const data = ConfigSchema.parse({
-    aValues: [],
-    cnames: [],
+    aValues,
+    cnames,
     misconfigured: true,
-    nameservers: [],
+    nameservers,
   });
 
   return c.json(data);
