@@ -33,6 +33,14 @@ export async function checkCnameRecord(
   }
 }
 
+/**
+ * Retrieves a list of name servers for the specified domain.
+ * This function performs a DNS query to obtain a list of name servers associated with the given domain.
+ * It is used for checking and managing the DNS configuration of a domain.
+ * @param {string} domain The domain name for which to retrieve the name servers.
+ * @returns {Promise<string[]>} A promise that resolves to an array of strings representing the name servers for the domain.
+ */
+
 export async function getNameServers(domain: string): Promise<string[]> {
   try {
     const primaryDomain = getPrimaryDomain(domain);
@@ -51,6 +59,13 @@ export async function getNameServers(domain: string): Promise<string[]> {
     return [];
   }
 }
+/*
+ * Retrieves A records for the specified domain.
+ * This function attempts to resolve A records for the given domain and returns a list of IP addresses
+ * associated with that domain. In case of an error while fetching the records, the function returns an empty list.
+ * @param {string} domain The domain name for which to retrieve A records.
+ * @returns {Promise<string[]>} A promise that resolves to a list of IP addresses associated with the domain, or an empty list if no records are found.
+ */
 
 export async function getAServers(domain: string): Promise<string[]> {
   try {
@@ -58,9 +73,7 @@ export async function getAServers(domain: string): Promise<string[]> {
     return records;
   } catch (err) {
     if (err instanceof Error) {
-      console.error(
-        `Error fetching NameServer record for ${domain}: ${err.message}`
-      );
+      console.error(`Error fetching A record for ${domain}: ${err.message}`);
     } else {
       console.error(
         `An unknown error occurred while fetching NameServer record for ${domain}`
@@ -77,7 +90,7 @@ export async function getCnameServers(domain: string): Promise<string[]> {
   } catch (err) {
     if (err instanceof Error) {
       console.error(
-        `Error fetching NameServer record for ${domain}: ${err.message}`
+        `Error fetching CNAME record for ${domain}: ${err.message}`
       );
     } else {
       console.error(
