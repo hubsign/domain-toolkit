@@ -20,7 +20,7 @@ const ParamsSchema = z.object({
     }),
 });
 
-const VerifySchema = z
+const GetSchema = z
   .object({
     verified: z.boolean().default(false).openapi({
       description:
@@ -28,15 +28,15 @@ const VerifySchema = z
     }),
   })
   .openapi({
-    description: "Verify",
+    description: "Get",
     required: ["domain"],
   });
 
-export const verifyRoute = createRoute({
-  method: "post",
+export const getRoute = createRoute({
+  method: "get",
   tags: ["domains"],
-  description: "Verify a domain",
-  path: "/:domain/verify",
+  description: "Get a domain",
+  path: "/:domain",
   request: {
     params: ParamsSchema,
   },
@@ -44,10 +44,10 @@ export const verifyRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: VerifySchema,
+          schema: GetSchema,
         },
       },
-      description: "Verify",
+      description: "Get",
     },
     401: {
       content: {
@@ -63,19 +63,19 @@ export const verifyRoute = createRoute({
           schema: ErrorSchema,
         },
       },
-      description: "Returns an error",
+      description: "Not found",
     },
   },
 });
 
-export const verifyHandler = async (
+export const getHandler = async (
   c: RequestContext<TypeOf<typeof ParamsSchema>>
 ) => {
   const { domain } = c.req.valid("param");
 
   const result = await checkCnameRecord(domain, env.CNAME_TARGET);
 
-  const data = VerifySchema.parse({ verified: result });
+  const data = GetSchema.parse({ verified: result });
 
   return c.json(data);
 };

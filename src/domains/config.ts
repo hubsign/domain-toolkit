@@ -1,8 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import type { Context } from "hono";
 import { ErrorSchema, RequestContext } from "../shared";
-import { checkCnameRecord } from "./utils";
-import { env } from "../env";
 import { TypeOf } from "zod";
 
 const ParamsSchema = z.object({
@@ -20,23 +17,31 @@ const ParamsSchema = z.object({
     }),
 });
 
-const VerifySchema = z
+const ConfigSchema = z
   .object({
-    verified: z.boolean().default(false).openapi({
-      description:
-        "A flag indicating whether the domain has been successfully verified. Returns 'true' if the domain is verified, and 'false' otherwise.",
+    aValues: z.string().array().openapi({
+      description: "",
+    }),
+    cnames: z.string().array().openapi({
+      description: "",
+    }),
+    nameservers: z.string().array().openapi({
+      description: "",
+    }),
+    misconfigured: z.boolean().openapi({
+      description: "",
     }),
   })
   .openapi({
-    description: "Verify",
+    description: "Config",
     required: ["domain"],
   });
 
-export const verifyRoute = createRoute({
-  method: "post",
+export const configRoute = createRoute({
+  method: "get",
   tags: ["domains"],
-  description: "Verify a domain",
-  path: "/:domain/verify",
+  description: "Get a Domain's configuration.",
+  path: "/:domain/config",
   request: {
     params: ParamsSchema,
   },
@@ -44,10 +49,10 @@ export const verifyRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: VerifySchema,
+          schema: ConfigSchema,
         },
       },
-      description: "Verify",
+      description: "Config",
     },
     401: {
       content: {
@@ -68,14 +73,19 @@ export const verifyRoute = createRoute({
   },
 });
 
-export const verifyHandler = async (
+export const configHandler = async (
   c: RequestContext<TypeOf<typeof ParamsSchema>>
 ) => {
   const { domain } = c.req.valid("param");
 
-  const result = await checkCnameRecord(domain, env.CNAME_TARGET);
+  //
 
-  const data = VerifySchema.parse({ verified: result });
+  const data = ConfigSchema.parse({
+    aValues: [],
+    cnames: [],
+    misconfigured: true,
+    nameservers: [],
+  });
 
   return c.json(data);
 };
