@@ -24,6 +24,9 @@ const ConfigSchema = z
       description:
         "An array of IP addresses associated with the domain's A records. These records map the domain to its corresponding IP addresses.",
     }),
+    conflicts: z.string().array().openapi({
+      description: "",
+    }),
     cnames: z.string().array().openapi({
       description:
         "An array of canonical names for the domain, specified as CNAME records. These records map domain aliases to their canonical (true) domain names.",
@@ -89,7 +92,8 @@ export const configHandler = async (
   const data = ConfigSchema.parse({
     aValues,
     cnames,
-    misconfigured: true,
+    conflicts: [],
+    misconfigured: false,
     nameservers,
   });
 
