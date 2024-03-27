@@ -47,7 +47,7 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         with:
-          args: rollout status deployment/trpc
+          args: rollout status deployment/domain-toolkit
       - name: Deploy Inngest To Cluster
         uses: kodermax/kubectl-aws-eks@main
         env:
