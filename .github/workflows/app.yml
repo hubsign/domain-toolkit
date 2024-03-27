@@ -48,18 +48,3 @@ jobs:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         with:
           args: rollout status deployment/domain-toolkit
-      - name: Deploy Inngest To Cluster
-        uses: kodermax/kubectl-aws-eks@main
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-          CR_REGISTRY: ${{ secrets.CR_REGISTRY }}
-          CR_REPOSITORY: domain-toolkit
-          IMAGE_TAG: ${{ github.sha }}
-        with:
-          args: set image deployment/domain-toolkit inngest=cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-      - name: Verify Inngest Deployment
-        uses: kodermax/kubectl-aws-eks@main
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-        with:
-          args: rollout status deployment/domain-toolkit
