@@ -3,6 +3,7 @@ import { domainsApi } from "./domains";
 import { middleware } from "./middleware";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
+import { showRoutes } from "hono/dev";
 
 const app = new Hono();
 
@@ -26,7 +27,12 @@ api.doc("/openapi", {
 api.route("/domains", domainsApi);
 
 app.route("/", api);
-export default {
-  port: 8000,
-  fetch: app.fetch,
-};
+const isDev = process.env.NODE_ENV === "development";
+
+const port = isDev ? 8001 : 8000;
+if (isDev) showRoutes(app, { verbose: true, colorize: true });
+
+console.log(`Starting server on port ${port}`);
+const server = { port, fetch: app.fetch };
+
+export default server;
