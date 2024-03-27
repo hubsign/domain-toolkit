@@ -5,10 +5,11 @@ on:
     branches: [main]
     paths:
       - "src/**"
+      - "package.json"
 jobs:
   # Deploy to EKS
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ startsWith(github.event.pull_request.head.ref, 'dependabot/') == false && startsWith(github.event.pull_request.head.ref, 'renovate/') == false }}
     steps:
       - name: Checkout
