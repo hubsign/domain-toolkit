@@ -1,0 +1,14 @@
+# This is meant for local development only. Do not use this in production.
+version: "3.8"
+services:
+  domain-toolkit:
+    restart: always
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: domain-toolkit
+    ports:
+      - '8000:8000'
+

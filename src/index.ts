@@ -11,6 +11,7 @@ export const api = new OpenAPIHono();
 app.get("/health", (c) => {
   return c.text("Health Live!");
 });
+app.get("/", (c) => c.text("Domain Toolkit API"));
 
 app.use("/domains/*", middleware);
 api.use("/*", cors());
