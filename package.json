@@ -4,7 +4,8 @@
   "author": "Maksim",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build:prod": "bun build --target=bun ./src/index.ts --outdir ./dist"
+    "build:prod": "bun build --target=bun ./src/index.ts --outdir ./dist",
+    "start": "NODE_ENV=production bun run src/index.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "^0.9.9",
