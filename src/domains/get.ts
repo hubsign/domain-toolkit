@@ -4,6 +4,7 @@ import { ErrorSchema, RequestContext } from "../shared";
 import { checkCnameRecord } from "../utils/dns";
 import { env } from "../env";
 import { TypeOf } from "zod";
+import { checkDomainInKubernetes } from "../utils/k8s";
 
 const ParamsSchema = z.object({
   domain: z
@@ -73,9 +74,9 @@ export const getHandler = async (
 ) => {
   const { domain } = c.req.valid("param");
 
-  const result = await checkCnameRecord(domain, env.CNAME_TARGET);
+  const domainExistsInKubernetes = await checkDomainInKubernetes(domain);
 
-  const data = GetSchema.parse({ verified: result });
+  const data = GetSchema.parse({ verified: !domainExistsInKubernetes });
 
   return c.json(data);
 };
