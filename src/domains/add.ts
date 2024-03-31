@@ -17,6 +17,7 @@ const AddDomainSchema = z.object({
       description: "The project domain name.",
       example: "acme.com",
     }),
+  userId: z.string().min(1),
 });
 
 const ResponseSchema = z
@@ -94,6 +95,7 @@ export const addHandler = async (
       annotations: {
         "custom/uid": nanoid(),
         "custom/domain-name": input.name,
+        "custom/userId": input.userId,
       },
     },
     spec: {
@@ -109,7 +111,7 @@ export const addHandler = async (
             },
           ],
         },
-      ]
+      ],
     },
   };
   try {

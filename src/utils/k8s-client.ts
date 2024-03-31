@@ -10,4 +10,4 @@ if (env.KUBE_CONFIG_DATA) {
   kc.loadFromDefault();
 }
 const customObjectApi = kc.makeApiClient(k8s.CustomObjectsApi);
-export { customObjectApi };
+export { kc, customObjectApi };
