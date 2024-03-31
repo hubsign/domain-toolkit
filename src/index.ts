@@ -30,7 +30,7 @@ app.route("/", api);
 const isDev = process.env.NODE_ENV === "development";
 
 const port = isDev ? 8001 : 8000;
-if (isDev) showRoutes(app, { verbose: true, colorize: true });
+if (isDev) showRoutes(app, { verbose: false, colorize: true });
 
 console.log(`Starting server on port ${port}`);
 const server = { port, fetch: app.fetch };

@@ -11,6 +11,7 @@ export const env = createEnv({
     API_VERSION: z.string(),
     SERVICE_NAME: z.string(),
     SERVICE_PORT: z.number().optional(),
+    DOMAIN_NAME: z.string().url(),
   },
 
   /**
