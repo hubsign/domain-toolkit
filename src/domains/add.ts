@@ -109,10 +109,7 @@ export const addHandler = async (
             },
           ],
         },
-      ],
-      tls: {
-        certResolver: "letsencrypt",
-      },
+      ]
     },
   };
   try {

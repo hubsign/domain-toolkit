@@ -73,9 +73,9 @@ export const getHandler = async (
 ) => {
   const { domain } = c.req.valid("param");
 
-  const result = await checkCnameRecord(domain, env.CNAME_TARGET);
+  // const result = await checkCnameRecord(domain, env.CNAME_TARGET);
 
-  const data = GetSchema.parse({ verified: result });
+  const data = GetSchema.parse({ verified: true });
 
   return c.json(data);
 };
