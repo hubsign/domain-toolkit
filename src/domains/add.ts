@@ -9,6 +9,7 @@ const AddDomainSchema = z.object({
   name: z
     .string()
     .min(1)
+    .toLowerCase()
     .openapi({
       param: {
         name: "name",
@@ -17,7 +18,9 @@ const AddDomainSchema = z.object({
       description: "The project domain name.",
       example: "acme.com",
     }),
-  userId: z.string().min(1),
+  userId: z.string().min(1).openapi({
+    description: "The unique identifier of the user owning the domain.",
+  }),
 });
 
 const ResponseSchema = z
@@ -85,7 +88,7 @@ export const addHandler = async (
   const serviceName = env.SERVICE_NAME || "web";
   const servicePort = parseInt(env.SERVICE_PORT || "3000", 10);
   const uniqueName = `${input.name}-${Date.now()}`;
-
+  // check domain exist
   const ingressRoute = {
     apiVersion,
     kind: "IngressRoute",

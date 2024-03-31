@@ -1,8 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import type { Context } from "hono";
 import { ErrorSchema, RequestContext } from "../shared";
-import { checkCnameRecord } from "../utils/dns";
-import { env } from "../env";
 import { TypeOf } from "zod";
 import { checkDomainInKubernetes } from "../utils/k8s";
 
@@ -10,6 +7,7 @@ const ParamsSchema = z.object({
   domain: z
     .string()
     .min(1)
+    .toLowerCase()
     .openapi({
       param: {
         name: "domain",
@@ -73,7 +71,6 @@ export const getHandler = async (
   c: RequestContext<TypeOf<typeof ParamsSchema>>
 ) => {
   const { domain } = c.req.valid("param");
-
   const domainExistsInKubernetes = await checkDomainInKubernetes(domain);
 
   const data = GetSchema.parse({ verified: !domainExistsInKubernetes });

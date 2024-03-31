@@ -1,7 +1,9 @@
 import { customObjectApi } from "./k8s-client";
 
 interface TraefikIngressRoute {
-  spec: { routes: Array<{ match: { rule: string } }> };
+  metadata: {
+    annotations: Record<string, string>;
+  };
 }
 interface TraefikIngressRouteList {
   items: TraefikIngressRoute[];
@@ -21,8 +23,9 @@ export const checkDomainInKubernetes = async (
       plural
     )) as { body: TraefikIngressRouteList };
     const domainExists = body.items.some((item) => {
-      return item.spec.routes.some((route) =>
-        route.match.rule.includes(domain)
+      return (
+        item.metadata.annotations &&
+        item.metadata.annotations["custom/domain-name"] === domain
       );
     });
     return domainExists;
