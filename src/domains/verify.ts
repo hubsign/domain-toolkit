@@ -9,6 +9,7 @@ const ParamsSchema = z.object({
   domain: z
     .string()
     .min(1)
+    .toLowerCase()
     .openapi({
       param: {
         name: "domain",

@@ -4,6 +4,7 @@ import { TypeOf } from "zod";
 import { customObjectApi } from "../utils/k8s-client";
 import { env } from "../env";
 import { nanoid } from "nanoid";
+import { findDomainByName } from "../utils/k8s-helpers";
 
 const AddDomainSchema = z.object({
   name: z
@@ -88,7 +89,8 @@ export const addHandler = async (
   const serviceName = env.SERVICE_NAME || "web";
   const servicePort = parseInt(env.SERVICE_PORT || "3000", 10);
   const uniqueName = `${input.name}-${Date.now()}`;
-  // check domain exist
+  const existDomain = await findDomainByName(input.name);
+  console.log(existDomain);
   const ingressRoute = {
     apiVersion,
     kind: "IngressRoute",
@@ -117,6 +119,7 @@ export const addHandler = async (
       ],
     },
   };
+
   try {
     await customObjectApi.createNamespacedCustomObject(
       "traefik.io",
