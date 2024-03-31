@@ -4,7 +4,11 @@ import { TypeOf } from "zod";
 import { customObjectApi } from "../utils/k8s-client";
 import { env } from "../env";
 import { nanoid } from "nanoid";
-import { findDomainByName } from "../utils/k8s-helpers";
+import { findDomainByName } from "../lib/find-domain";
+import {
+  DomainVerificationAttempt,
+  createDomainVerificationAttempt,
+} from "../lib/domain-verification-attempt";
 
 const AddDomainSchema = z.object({
   name: z
@@ -23,18 +27,21 @@ const AddDomainSchema = z.object({
     description: "The unique identifier of the user owning the domain.",
   }),
 });
-const VerificationSchema = z.object({
-  type: z.literal("TXT"),
-  domain: z.string(),
-  value: z.string(),
-  reason: z.literal("pending_domain_verification"),
-});
+const VerificationSchema = z
+  .object({
+    type: z.literal("TXT"),
+    domain: z.string(),
+    value: z.string(),
+    reason: z.literal("pending_domain_verification"),
+  })
+  .array();
 const ResponseSchema = z
   .object({
     name: z.string().min(1).openapi({
       description: "Domain name",
     }),
-    verification: VerificationSchema,
+    verified: z.boolean(),
+    verification: VerificationSchema.nullish(),
   })
   .openapi({
     description: "The domain was successfully added to the project",
@@ -114,17 +121,36 @@ export const addHandler = async (
     existDomain &&
     existDomain.metadata.annotations["custom/userId"] !== input.userId
   ) {
-    return c.json({
-      verified: false,
-      verification: [
-        {
-          type: "TXT",
-          domain: "_domain.qco.me",
-          value: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
-          reason: "pending_domain_verification",
-        },
-      ],
-    });
+    const attempt: DomainVerificationAttempt = {
+      apiVersion: "example.com/v1",
+      kind: "DomainVerificationAttempt",
+      metadata: {
+        name: "example-verification-attempt",
+        namespace: "default", // Опционально
+      },
+      spec: {
+        domainName: input.name,
+        userId: input.userId,
+        txtRecord: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
+        verificationStatus: "Pending",
+      },
+    };
+
+    await createDomainVerificationAttempt(attempt);
+    return c.json(
+      ResponseSchema.parse({
+        name: input.name,
+        verified: false,
+        verification: [
+          {
+            type: "TXT",
+            domain: "_domain.qco.me",
+            value: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
+            reason: "pending_domain_verification",
+          },
+        ],
+      })
+    );
   }
 
   const ingressRoute = {
@@ -168,7 +194,7 @@ export const addHandler = async (
     console.log(err);
   }
 
-  const data = ResponseSchema.parse({ name: input.name });
+  const data = ResponseSchema.parse({ name: input.name, verified: true });
 
   return c.json(data);
 };

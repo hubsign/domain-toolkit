@@ -2,11 +2,13 @@ import { z } from "@hono/zod-openapi";
 import { Context } from "hono";
 
 export const ErrorSchema = z.object({
-  code: z.number().openapi({
-    example: 400,
-  }),
-  message: z.string().openapi({
-    example: "Bad Request",
+  error: z.object({
+    code: z.string().openapi({
+      example: "domain_already_in_use",
+    }),
+    message: z.string().openapi({
+      example: "Bad Request",
+    }),
   }),
 });
 

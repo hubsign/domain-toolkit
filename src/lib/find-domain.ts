@@ -1,5 +1,5 @@
 import { env } from "../env";
-import { customObjectApi } from "./k8s-client";
+import { customObjectApi } from "../utils/k8s-client";
 
 interface TraefikIngressRoute {
   metadata: {
@@ -9,6 +9,7 @@ interface TraefikIngressRoute {
 interface TraefikIngressRouteList {
   items: TraefikIngressRoute[];
 }
+
 // Define the structure of the metadata annotations within an IngressRoute
 interface IngressRouteAnnotations {
   "custom/domain-name": string;
@@ -36,33 +37,6 @@ interface KubernetesApiResponse {
   };
   // Include other properties of the Kubernetes API response as needed
 }
-
-export const checkDomainInKubernetes = async (
-  domain: string
-): Promise<boolean> => {
-  try {
-    const group = "traefik.io";
-    const version = "v1alpha1";
-    const namespace = "default";
-    const plural = "ingressroutes";
-    const { body } = (await customObjectApi.listNamespacedCustomObject(
-      group,
-      version,
-      namespace,
-      plural
-    )) as { body: TraefikIngressRouteList };
-    const domainExists = body.items.some((item) => {
-      return (
-        item.metadata.annotations &&
-        item.metadata.annotations["custom/domain-name"] === domain
-      );
-    });
-    return domainExists;
-  } catch (error) {
-    console.error(`Error querying Traefik CRD for domain ${domain}:`, error);
-    throw new Error("Failed to query Traefik CRD");
-  }
-};
 
 /**
  * Finds a domain by its custom/domain-name annotation.
