@@ -88,7 +88,7 @@ export const addHandler = async (
   const serviceName = env.SERVICE_NAME || "web";
   const servicePort = parseInt(env.SERVICE_PORT || "3000", 10);
   const uniqueName = `${input.name}-${Date.now()}`;
-
+  // check domain exist
   const ingressRoute = {
     apiVersion,
     kind: "IngressRoute",
