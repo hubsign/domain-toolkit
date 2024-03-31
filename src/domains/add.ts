@@ -121,17 +121,20 @@ export const addHandler = async (
     existDomain &&
     existDomain.metadata.annotations["custom/userId"] !== input.userId
   ) {
+    const verificationKey = `vc-domain-verify=${env.DOMAIN_NAME},${nanoid()}`;
+    const attemptName = `domain-verification-attempt-${input.name}`;
     const attempt: DomainVerificationAttempt = {
-      apiVersion: "example.com/v1",
+      apiVersion: `${env.DOMAIN_NAME}/v1`,
       kind: "DomainVerificationAttempt",
       metadata: {
-        name: "example-verification-attempt",
-        namespace: "default", // Опционально
+        name: attemptName,
+        namespace: env.NAMESPACE || "default",
       },
       spec: {
         domainName: input.name,
         userId: input.userId,
-        txtRecord: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
+        txtDomain: `_domain.${env.DOMAIN_NAME}`,
+        txtRecord: verificationKey,
         verificationStatus: "Pending",
       },
     };
@@ -144,8 +147,8 @@ export const addHandler = async (
         verification: [
           {
             type: "TXT",
-            domain: "_domain.qco.me",
-            value: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
+            domain: `_domain.${env.DOMAIN_NAME}`,
+            value: verificationKey,
             reason: "pending_domain_verification",
           },
         ],

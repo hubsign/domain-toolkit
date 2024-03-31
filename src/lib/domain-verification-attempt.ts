@@ -1,3 +1,4 @@
+import { env } from "../env";
 import { customObjectApi } from "../utils/k8s-client";
 
 export interface DomainVerificationAttempt {
@@ -11,6 +12,7 @@ export interface DomainVerificationAttempt {
     domainName: string;
     userId: string;
     txtRecord: string;
+    txtDomain: string;
     verificationStatus: "Pending" | "Verified" | "Failed";
   };
 }
@@ -18,7 +20,7 @@ export interface DomainVerificationAttempt {
 export async function createDomainVerificationAttempt(
   attempt: DomainVerificationAttempt
 ): Promise<void> {
-  const group = "example.com";
+  const group = env.DOMAIN_NAME;
   const version = "v1";
   const namespace = attempt.metadata.namespace || "default";
   const plural = "domainverificationattempts";
