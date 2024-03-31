@@ -73,18 +73,23 @@ export const findDomainByName = async (domainName: string) => {
   const namespace = env.NAMESPACE || "default";
 
   try {
-    const result = (await customObjectApi.listNamespacedCustomObject(
-      "traefik.io",
-      "v1alpha1",
+    const group = "traefik.io";
+    const version = "v1alpha1";
+    const plural = "ingressroutes";
+    const { body } = (await customObjectApi.listNamespacedCustomObject(
+      group,
+      version,
       namespace,
-      "ingressroutes",
-      undefined,
-      undefined,
-      `custom/domain-name=${domainName}`
-    )) as KubernetesApiResponse;
+      plural
+    )) as { body: TraefikIngressRouteList };
+    const result = body.items.filter(
+      (item) =>
+        item.metadata.annotations &&
+        item.metadata.annotations["custom/domain-name"] === domainName
+    );
 
-    if (result.body.items.length > 0) {
-      return result.body.items[0];
+    if (result.length > 0) {
+      return result[0];
     } else {
       return null;
     }

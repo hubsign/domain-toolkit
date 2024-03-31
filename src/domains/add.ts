@@ -23,12 +23,18 @@ const AddDomainSchema = z.object({
     description: "The unique identifier of the user owning the domain.",
   }),
 });
-
+const VerificationSchema = z.object({
+  type: z.literal("TXT"),
+  domain: z.string(),
+  value: z.string(),
+  reason: z.literal("pending_domain_verification"),
+});
 const ResponseSchema = z
   .object({
     name: z.string().min(1).openapi({
-      description: "The project domain name",
+      description: "Domain name",
     }),
+    verification: VerificationSchema,
   })
   .openapi({
     description: "The domain was successfully added to the project",
@@ -91,6 +97,37 @@ export const addHandler = async (
   const uniqueName = `${input.name}-${Date.now()}`;
   const existDomain = await findDomainByName(input.name);
   console.log(existDomain);
+  if (
+    existDomain &&
+    existDomain.metadata.annotations["custom/userId"] === input.userId
+  ) {
+    return c.json(
+      {
+        error: {
+          code: "domain_already_in_use",
+          message: `Cannot add ${input.name} since it's already in use by your account.`,
+        },
+      },
+      400
+    ); // Assuming the framework supports setting the status code this way.
+  }
+  if (
+    existDomain &&
+    existDomain.metadata.annotations["custom/userId"] !== input.userId
+  ) {
+    return c.json({
+      verified: false,
+      verification: [
+        {
+          type: "TXT",
+          domain: "_domain.qco.me",
+          value: "vc-domain-verify=qco.me,5c11928ba43ce9eef102",
+          reason: "pending_domain_verification",
+        },
+      ],
+    });
+  }
+
   const ingressRoute = {
     apiVersion,
     kind: "IngressRoute",
