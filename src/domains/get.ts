@@ -1,7 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorSchema, RequestContext } from "../shared";
 import { TypeOf } from "zod";
-import { checkDomainInKubernetes } from "../utils/k8s";
+import { checkDomainInKubernetes } from "../utils/k8s-helpers";
 
 const ParamsSchema = z.object({
   domain: z
