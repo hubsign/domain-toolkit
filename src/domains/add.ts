@@ -96,7 +96,6 @@ export const addHandler = async (
   const servicePort = parseInt(env.SERVICE_PORT || "3000", 10);
   const uniqueName = `${input.name}-${Date.now()}`;
   const existDomain = await findDomainByName(input.name);
-  console.log(existDomain);
   if (
     existDomain &&
     existDomain.metadata.annotations["custom/userId"] === input.userId
