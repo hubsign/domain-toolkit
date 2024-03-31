@@ -27,7 +27,7 @@ jobs:
       - name: Build, tag, and push image
         env:
           CR_REGISTRY: ${{ secrets.CR_REGISTRY }}
-          CR_REPOSITORY: domain-toolkit
+          CR_REPOSITORY: qco-domain-toolkit
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -f Dockerfile  -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:latest .
@@ -38,7 +38,7 @@ jobs:
         env:
           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
           CR_REGISTRY: ${{ secrets.CR_REGISTRY }}
-          CR_REPOSITORY: domain-toolkit
+          CR_REPOSITORY: qco-domain-toolkit
           IMAGE_TAG: ${{ github.sha }}
         with:
           args: set image deployment/$CR_REPOSITORY $CR_REPOSITORY=cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
