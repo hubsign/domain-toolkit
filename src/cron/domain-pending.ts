@@ -1,5 +1,4 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import type { Context } from "hono";
 import { ErrorSchema, RequestContext } from "../shared";
 import { checkCnameRecord } from "../utils/dns";
 import { env } from "../env";
