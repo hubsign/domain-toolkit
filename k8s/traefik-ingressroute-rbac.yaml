@@ -34,7 +34,7 @@ metadata:
   namespace: default
   name: domain-verification-attempt-creator
 rules:
-  - apiGroups: ["qco.me"]
+  - apiGroups: ["acme.com"]
     resources: ["domainverificationattempts"]
     verbs: ["create"]
 
