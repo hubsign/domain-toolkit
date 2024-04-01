@@ -65,6 +65,7 @@ export const domainPendingHandler = async (
   const domains = await fetchIngressRoutes();
   for (const item of domains) {
     const hasCname = await checkCnameRecord(item.domain, env.CNAME_TARGET);
+    //TODO
     console.log(`Domain ${item.domain} has CNAME record: ${hasCname}`);
   }
   return c.json({ ok: true });
