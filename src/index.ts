@@ -4,6 +4,7 @@ import { middleware } from "./middleware";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { showRoutes } from "hono/dev";
+import { cronApi } from "./cron";
 
 const app = new Hono();
 
@@ -25,6 +26,7 @@ api.doc("/openapi", {
   },
 });
 api.route("/domains", domainsApi);
+api.route("/cron", cronApi);
 
 app.route("/", api);
 const isDev = process.env.NODE_ENV === "development";
