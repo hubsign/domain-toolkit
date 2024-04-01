@@ -155,7 +155,7 @@ export const addHandler = async (
       })
     );
   }
-
+  // TODO : вынести функцию
   const ingressRoute = {
     apiVersion,
     kind: "IngressRoute",
