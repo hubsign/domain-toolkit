@@ -4,6 +4,7 @@ import { ErrorSchema, RequestContext } from "../shared";
 import { checkCnameRecord } from "../utils/dns";
 import { env } from "../env";
 import { TypeOf } from "zod";
+import { fetchIngressRoutes } from "../lib/ingress-route-list";
 
 const ParamsSchema = z.object({
   domain: z
@@ -61,5 +62,10 @@ export const domainPendingRoute = createRoute({
 export const domainPendingHandler = async (
   c: RequestContext<TypeOf<typeof ParamsSchema>>
 ) => {
+  const domains = await fetchIngressRoutes();
+  for (const item of domains) {
+    const hasCname = await checkCnameRecord(item.domain, env.CNAME_TARGET);
+    console.log(`Domain ${item.domain} has CNAME record: ${hasCname}`);
+  }
   return c.json({ ok: true });
 };
