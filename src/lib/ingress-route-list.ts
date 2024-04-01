@@ -20,6 +20,7 @@ export async function fetchIngressRoutes(): Promise<IngressRoute[]> {
       plural
     )) as { body: TraefikIngressRouteList };
     const result = body.items.filter((item) => !item.spec.tls);
+    console.log(result);
     if (result.length) {
       return result.map((item) => ({
         domain: item.metadata.annotations["custom/domain-name"],
