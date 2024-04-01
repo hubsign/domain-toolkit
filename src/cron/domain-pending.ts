@@ -1,10 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import type { Context } from "hono";
 import { ErrorSchema, RequestContext } from "../shared";
 import { checkCnameRecord } from "../utils/dns";
 import { env } from "../env";
 import { TypeOf } from "zod";
 import { fetchIngressRoutes } from "../lib/ingress-route-list";
+import { addTlsToIngressRoute } from "../lib/add-tls-to-ingress-route";
 
 const ParamsSchema = z.object({
   domain: z
@@ -65,6 +65,10 @@ export const domainPendingHandler = async (
   const domains = await fetchIngressRoutes();
   for (const item of domains) {
     const hasCname = await checkCnameRecord(item.domain, env.CNAME_TARGET);
+    if (hasCname) {
+      await addTlsToIngressRoute("");
+    }
+    //TODO
     console.log(`Domain ${item.domain} has CNAME record: ${hasCname}`);
   }
   return c.json({ ok: true });

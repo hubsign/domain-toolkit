@@ -12,7 +12,6 @@ import { customObjectApi } from "../utils/k8s-client";
  */
 export const findDomainByName = async (domainName: string) => {
   const namespace = env.NAMESPACE || "default";
-
   try {
     const group = "traefik.io";
     const version = "v1alpha1";
