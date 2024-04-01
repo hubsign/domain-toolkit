@@ -9,8 +9,10 @@ import {
   DomainVerificationAttempt,
   createDomainVerificationAttempt,
 } from "../lib/domain-verification-attempt";
+import { createIngressRoute } from "../lib/create-ingress-route";
+import { checkCnameRecord } from "../utils/dns";
 
-const AddDomainSchema = z.object({
+export const AddDomainSchema = z.object({
   name: z
     .string()
     .min(1)
@@ -155,47 +157,9 @@ export const addHandler = async (
       })
     );
   }
+  const hasCnameRecord = await checkCnameRecord(input.name, env.CNAME_TARGET);
 
-  const ingressRoute = {
-    apiVersion,
-    kind: "IngressRoute",
-    metadata: {
-      name: uniqueName,
-      namespace,
-      annotations: {
-        "custom/uid": nanoid(),
-        "custom/domain-name": input.name,
-        "custom/userId": input.userId,
-      },
-    },
-    spec: {
-      entryPoints,
-      routes: [
-        {
-          match: `Host(\`${input.name}\`)`,
-          kind: "Rule",
-          services: [
-            {
-              name: serviceName,
-              port: servicePort,
-            },
-          ],
-        },
-      ],
-    },
-  };
-
-  try {
-    await customObjectApi.createNamespacedCustomObject(
-      "traefik.io",
-      "v1alpha1",
-      "default",
-      "ingressroutes",
-      ingressRoute
-    );
-  } catch (err: unknown) {
-    console.log(err);
-  }
+  await createIngressRoute(input, hasCnameRecord);
 
   const data = ResponseSchema.parse({ name: input.name, verified: true });
 
